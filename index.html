@@ -441,7 +441,7 @@
     <div class="subtitle" id="results-subtitle"></div>
     <table>
       <thead>
-        <tr><th style="width:34px;">大題</th><th style="width:34px;">題號</th><th>喻依</th><th>喻體答案</th><th>原因</th><th style="width:90px;">作答用時</th></tr>
+        <tr><th style="width:34px;">大題</th><th style="width:34px;">題號</th><th>喻體答案</th><th>喻依</th><th>原因</th><th style="width:90px;">作答用時</th></tr>
       </thead>
       <tbody id="results-body"></tbody>
     </table>
@@ -777,8 +777,8 @@ function renderResults(){
       tr.innerHTML = `
         <td>${sIdx + 1}</td>
         <td>${i + 1}</td>
-        <td>${escapeHtml(a.concept)}</td>
         <td>${part1Cell}</td>
+        <td>${escapeHtml(a.concept)}</td>
         <td>${part2Cell}</td>
         <td>${a.elapsedMs !== null ? formatElapsed(a.elapsedMs) : "—"}</td>
       `;
