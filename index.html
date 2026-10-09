@@ -385,7 +385,7 @@
 
     <div class="actions">
       <button class="btn-secondary" id="btn-back-howto">上一步</button>
-      <button class="btn-primary" id="btn-start-test" disabled>開始作答（開始第一大題，倒數7分鐘）</button>
+      <button class="btn-primary" id="btn-start-test" disabled>請先閱讀說明（40 秒後可開始作答）</button>
     </div>
   </section>
 
@@ -508,7 +508,10 @@ $("btn-to-instructions").addEventListener("click", () => {
 });
 
 $("btn-back-intro-from-howto").addEventListener("click", () => show("screen-intro"));
-$("btn-howto-to-instructions").addEventListener("click", () => show("screen-instructions"));
+$("btn-howto-to-instructions").addEventListener("click", () => {
+  show("screen-instructions");
+  startReadCountdown();
+});
 $("btn-back-howto").addEventListener("click", () => show("screen-howto"));
 
 function validateIntro(){
@@ -597,10 +600,47 @@ function requestVersionAssignment(){
   document.body.appendChild(script);
 }
 
+/* ---- 說明頁：先倒數40秒才能按「開始作答」 ---- */
+const READ_SECONDS = 40;
+let readRemaining = READ_SECONDS;
+let readTimer = null;
+let readDone = false;
+let versionReady = false;
+
+function startReadCountdown(){
+  // 只在第一次進入說明頁時開始倒數，來回切換頁面不會重算也不會重複啟動
+  if (readTimer || readDone) return;
+  readRemaining = READ_SECONDS;
+  updateStartButton();
+  readTimer = setInterval(() => {
+    readRemaining--;
+    if (readRemaining <= 0){
+      clearInterval(readTimer);
+      readDone = true;
+    }
+    updateStartButton();
+  }, 1000);
+}
+
+function updateStartButton(){
+  const btn = $("btn-start-test");
+  $("assign-status").textContent = versionReady ? "題目已準備完成。" : "正在準備您的題目，請稍候…";
+  if (!readDone){
+    btn.disabled = true;
+    btn.textContent = `請先閱讀說明（${readRemaining} 秒後可開始作答）`;
+  } else if (!versionReady){
+    btn.disabled = true;
+    btn.textContent = "題目準備中，請稍候…";
+  } else {
+    btn.disabled = false;
+    btn.textContent = "開始作答（開始第一大題）";
+  }
+}
+
 function onVersionAssigned(){
   sections = buildSections(assignedVersion);
-  $("assign-status").textContent = "題目已準備完成，可以開始作答。";
-  $("btn-start-test").disabled = false;
+  versionReady = true;
+  updateStartButton();
 }
 
 function buildSections(version){
